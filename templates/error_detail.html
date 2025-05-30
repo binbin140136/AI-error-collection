@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>错题详情 - 第{{ error.id }}题</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <link rel="stylesheet" href="/static/style.css" />
+    <style type="text/css">
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        font-size: 16px;
+        line-height: 1.5;
+        color: #333;
+        background-color: #f8f8f8;
+      }
+      .container {
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 15px;
+      }
+      h1 {
+        font-size: 1.8rem;
+        text-align: center;
+        margin-bottom: 20px;
+        color: #2c3e50;
+      }
+      h2 {
+        font-size: 1.5rem;
+        margin-top: 20px;
+        margin-bottom: 15px;
+        color: #2c3e50;
+      }
+      h3 {
+        font-size: 1.2rem;
+        color: #2c3e50;
+        margin-top: 15px;
+        margin-bottom: 10px;
+      }
+      .header-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #e0e0e0;
+        position: relative;
+      }
+      .header-bar h1 {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        margin: 0;
+        text-align: center;
+        width: 60%;
+      }
+      .back-button {
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 15px;
+        background-color: #3498db;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        z-index: 1; /* 确保按钮在标题之上，可点击 */
+      }
+      .error-card {
+        margin-bottom: 15px;
+        padding: 15px;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        background-color: white;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      }
+      .meta-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+      }
+      .subject-tag {
+        display: inline-block;
+        background-color: #3498db;
+        color: white;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+      }
+      .timestamp {
+        color: #7f8c8d;
+        font-size: 0.9rem;
+      }
+      .section {
+        margin-bottom: 20px;
+        padding: 15px;
+        border-radius: 8px;
+      }
+      .question-section {
+        background-color: #f9f9f9;
+      }
+      .solution-section {
+        background-color: #e8f5e9;
+      }
+      .mistakes-section {
+        background-color: #ffebee;
+      }
+      .knowledge-section {
+        background-color: #e3f2fd;
+      }
+      .answer-section {
+        background-color: #fff8e1;
+      }
+      .image-preview {
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        margin: 10px 0;
+        cursor: pointer;
+        transition: opacity 0.3s;
+      }
+      .image-preview:hover {
+        opacity: 0.9;
+      }
+      .knowledge-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+      }
+      .knowledge-tag {
+        background-color: #bbdefb;
+        color: #1565c0;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+      }
+      pre {
+        white-space: pre-wrap;
+        word-break: break-word;
+        background-color: #f5f5f5;
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 0.9rem;
+        max-height: 300px;
+        overflow-y: auto;
+        margin: 10px 0;
+      }
+      /* 图片预览模态框 */
+      .image-modal {
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.3s;
+      }
+      .hidden {
+        display: none !important;
+      }
+      .modal-content {
+        max-width: 90%;
+        max-height: 90%;
+        object-fit: contain;
+        border-radius: 4px;
+      }
+      .close-modal {
+        position: absolute;
+        top: 15px;
+        right: 25px;
+        color: #f1f1f1;
+        font-size: 40px;
+        font-weight: bold;
+        cursor: pointer;
+        z-index: 1001;
+      }
+      .close-modal:hover {
+        color: #bbb;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header-bar">
+        <a href="/" class="back-button">首页</a>
+        <h1>错题详情分析</h1>
+        <div style="width: 90px"></div>
+        <!-- 占位元素，保持布局平衡 -->
+      </div>
+
+      <div class="error-card">
+        <div class="meta-info">
+          <span class="subject-tag">{{ error.subject }}</span>
+          <span class="timestamp">{{ error.timestamp }}</span>
+        </div>
+
+        <div class="section question-section">
+          <h2>原题内容</h2>
+          {% if error.original_filename %}
+          <img
+            src="/static/images/{{ error.original_filename }}"
+            class="image-preview"
+            alt="错题图片"
+            id="questionImage"
+          />
+          {% endif %}
+          <pre>{{ error.text }}</pre>
+        </div>
+
+        <div class="section knowledge-section">
+          <h2>知识点分析</h2>
+          <div class="knowledge-tags">
+            {% for point in error.knowledge_points %}
+            <span class="knowledge-tag">{{ point }}</span>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="section mistakes-section">
+          <h2>常见误区</h2>
+          <pre>{{ error.common_mistakes }}</pre>
+        </div>
+
+        <div class="section solution-section">
+          <h2>正确解题思路</h2>
+          <pre>{{ error.correct_approach }}</pre>
+        </div>
+        <div class="section answer-section">
+          <h2>参考答案</h2>
+          <pre>{{ error.answer }}</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- 图片预览模态框 -->
+    <div id="imageModal" class="image-modal hidden">
+      <span class="close-modal">&times;</span>
+      <img id="modalImage" class="modal-content" />
+    </div>
+
+    <script>
+      // 图片预览功能
+      const questionImage = document.getElementById('questionImage');
+      const imageModal = document.getElementById('imageModal');
+      const modalImage = document.getElementById('modalImage');
+      const closeModal = document.querySelector('.close-modal');
+
+      // 确保模态框初始状态为关闭
+      if (imageModal) {
+        imageModal.classList.add('hidden');
+      }
+
+      // 点击图片打开预览
+      if (questionImage) {
+        questionImage.addEventListener('click', function () {
+          modalImage.src = this.src;
+          imageModal.classList.remove('hidden');
+          document.body.style.overflow = 'hidden'; // 防止背景滚动
+        });
+      }
+
+      // 点击关闭按钮关闭预览
+      if (closeModal) {
+        closeModal.addEventListener('click', function (e) {
+          imageModal.classList.add('hidden');
+          document.body.style.overflow = '';
+          e.stopPropagation(); // 阻止事件冒泡
+        });
+      }
+
+      // 点击模态框背景关闭预览
+      if (imageModal) {
+        imageModal.addEventListener('click', function (e) {
+          if (e.target === this) {
+            imageModal.classList.add('hidden');
+            document.body.style.overflow = '';
+          }
+        });
+      }
+    </script>
+  </body>
+</html>

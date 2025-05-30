@@ -1,0 +1,12 @@
+flask
+pillow
+pytesseract
+baidu-aip
+pandas
+matplotlib
+reportlab
+python-dotenv
+requests
+alibabacloud_tea_openapi
+alibabacloud_ocr_api20210707
+alibabacloud_tea_util

@@ -1,0 +1,346 @@
+* {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+      Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #333;
+    background-color: #f8f8f8;
+  }
+  .container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 15px 15px 15px;
+  }
+  .hidden {
+    display: none;
+  }
+  h1 {
+    font-size: 1.8rem;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #2c3e50;
+  }
+  h2 {
+    font-size: 1.5rem;
+    margin-top: 30px;
+    color: #2c3e50;
+  }
+  h3 {
+    font-size: 1.2rem;
+    color: #2c3e50;
+  }
+  .file-upload {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    overflow: hidden;
+  }
+  .header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid #e0e0e0;
+    position: relative;
+  }
+  .file-upload-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 12px 15px;
+    background-color: #f5f5f5;
+    color: #333;
+    border: 2px dashed #3498db;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-align: center;
+  }
+
+  .file-upload-label:hover {
+    background-color: #e8f4fc;
+    border-color: #2980b9;
+  }
+
+  .file-upload-label i {
+    margin-right: 8px;
+    font-size: 1.2rem;
+  }
+
+  .file-upload input[type='file'] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .file-name {
+    margin-top: 8px;
+    font-size: 0.9rem;
+    color: #666;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  #uploadForm {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  #fileInput {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+  }
+  button {
+    width: 100%;
+    padding: 12px 15px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  button:hover {
+    background-color: #2980b9;
+  }
+  button:disabled {
+    background-color: #bdc3c7;
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+
+  .button-group {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .clear-button {
+    background-color: #e74c3c;
+  }
+  .clear-button:hover {
+    background-color: #c0392b;
+  }
+
+  #result {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  #textResult {
+    white-space: pre-wrap;
+    word-break: break-word;
+    background-color: #f5f5f5;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  #imagePreview {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-top: 15px;
+  }
+  #errorList {
+    margin-top: 30px;
+  }
+  .error-item {
+    margin-bottom: 15px;
+    padding: 15px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    background-color: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  }
+  .error-item img {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+    margin-bottom: 10px;
+  }
+  .error-item p {
+    margin: 5px 0;
+  }
+  .error {
+    color: #e74c3c;
+  }
+  #analysisResult {
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+  }
+  .img-box {
+    position: relative;
+    line-height: 0;
+  }
+  .scanning {
+    position: absolute;
+    top: 15px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(#07aaff, #07aaff),
+      linear-gradient(90deg, #ffffff33 1px, transparent 0),
+      linear-gradient(#ffffff33 1px, transparent 0),
+      linear-gradient(transparent, #07aaff);
+    background-size: 100% 1.5%, 10% 100%, 100% 8%, 100% 100%;
+    background-repeat: no-repeat, repeat, repeat, no-repeat;
+    background-position: 0 0, 0 0, 0 0, 0 0;
+    animation: move 1s infinite linear;
+    display: none;
+  }
+  @keyframes move {
+    to {
+      background-position: 0 100%, 0 0, 0 0, 0 0;
+      clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+    }
+  }
+  /* 图片预览相关样式 */
+  .preview-image {
+    cursor: pointer;
+    transition: opacity 0.3s;
+  }
+  .preview-image:hover {
+    opacity: 0.9;
+  }
+  .image-modal {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s;
+  }
+  .hidden {
+    display: none !important;
+  }
+  .modal-content {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+    border-radius: 4px;
+  }
+  .close-modal {
+    position: absolute;
+    top: 15px;
+    right: 25px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 1001;
+  }
+  .close-modal:hover {
+    color: #bbb;
+  }
+
+  @media (min-width: 600px) {
+    #uploadForm {
+      flex-direction: column;
+    }
+    button[type='submit'] {
+      width: auto;
+      min-width: 120px;
+    }
+  }
+/* 修改错题列表滑动交互样式 */
+.error-item-wrapper {
+    position: relative;
+    overflow: hidden; /* 只在包装器上设置overflow:hidden */
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.error-item {
+    position: relative;
+    transition: transform 0.3s ease;
+    touch-action: pan-y pinch-zoom;
+    transform: translateX(0);
+    will-change: transform;
+    background: white;
+    padding: 15px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    margin-bottom: 0; /* 移除底部边距，由wrapper控制 */
+}
+
+/* 修改删除按钮样式，默认隐藏 */
+.delete-action {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 80px;
+    background-color: #e74c3c;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    border-radius: 0 8px 8px 0;
+    transform: translateX(100%); /* 初始位置在右侧隐藏 */
+    transition: transform 0.3s ease;
+}
+
+/* 显示删除按钮 */
+.error-item.show-delete + .delete-action {
+    transform: translateX(0); /* 显示删除按钮 */
+}
+
+.error-item.sliding {
+    transition: none;
+}
+
+.error-item.show-delete {
+    transform: translateX(-80px);
+}
+
+/* 防止容器被拖动 */
+.container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 15px 15px 15px;
+    overflow-x: hidden;
+    touch-action: pan-y pinch-zoom;
+}
+
+/* 防止错题列表容器被拖动 */
+#errorList {
+    margin-top: 30px;
+    overflow-x: hidden;
+    touch-action: pan-y pinch-zoom;
+}

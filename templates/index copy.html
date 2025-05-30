@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>AI错题管家</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <link rel="stylesheet" href="/static/style.css" />
+    <style type="text/css">
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        font-size: 16px;
+        line-height: 1.5;
+        color: #333;
+        background-color: #f8f8f8;
+      }
+      .container {
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 0 15px 15px 15px;
+      }
+      .hidden {
+        display: none;
+      }
+      h1 {
+        font-size: 1.8rem;
+        text-align: center;
+        margin-bottom: 20px;
+        color: #2c3e50;
+      }
+      h2 {
+        font-size: 1.5rem;
+        margin-top: 30px;
+        color: #2c3e50;
+      }
+      h3 {
+        font-size: 1.2rem;
+        color: #2c3e50;
+      }
+      .file-upload {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+        overflow: hidden;
+      }
+      .header-bar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-bottom: 1px solid #e0e0e0;
+        position: relative;
+      }
+      .file-upload-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        padding: 12px 15px;
+        background-color: #f5f5f5;
+        color: #333;
+        border: 2px dashed #3498db;
+        border-radius: 8px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-align: center;
+      }
+
+      .file-upload-label:hover {
+        background-color: #e8f4fc;
+        border-color: #2980b9;
+      }
+
+      .file-upload-label i {
+        margin-right: 8px;
+        font-size: 1.2rem;
+      }
+
+      .file-upload input[type='file'] {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+      }
+
+      .file-name {
+        margin-top: 8px;
+        font-size: 0.9rem;
+        color: #666;
+        text-align: center;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      #uploadForm {
+        margin-bottom: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+      #fileInput {
+        width: 0.1px;
+        height: 0.1px;
+        opacity: 0;
+        overflow: hidden;
+        position: absolute;
+        z-index: -1;
+      }
+      button {
+        width: 100%;
+        padding: 12px 15px;
+        background-color: #3498db;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+      button:hover {
+        background-color: #2980b9;
+      }
+      button:disabled {
+        background-color: #bdc3c7;
+        cursor: not-allowed;
+        opacity: 0.7;
+      }
+
+      .button-group {
+        display: flex;
+        gap: 10px;
+        width: 100%;
+      }
+
+      .clear-button {
+        background-color: #e74c3c;
+      }
+      .clear-button:hover {
+        background-color: #c0392b;
+      }
+
+      #result {
+        margin-top: 20px;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background-color: white;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      #textResult {
+        white-space: pre-wrap;
+        word-break: break-word;
+        background-color: #f5f5f5;
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 0.9rem;
+        max-height: 200px;
+        overflow-y: auto;
+      }
+      #imagePreview {
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        margin-top: 15px;
+      }
+      #errorList {
+        margin-top: 30px;
+      }
+      .error-item {
+        margin-bottom: 15px;
+        padding: 15px;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        background-color: white;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      }
+      .error-item img {
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        border-radius: 5px;
+        margin-bottom: 10px;
+      }
+      .error-item p {
+        margin: 5px 0;
+      }
+      .error {
+        color: #e74c3c;
+      }
+      #analysisResult {
+        margin-top: 15px;
+        padding: 10px;
+        background-color: #f9f9f9;
+        border-radius: 5px;
+      }
+      .img-box {
+        position: relative;
+        line-height: 0;
+      }
+      .scanning {
+        position: absolute;
+        top: 15px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(#07aaff, #07aaff),
+          linear-gradient(90deg, #ffffff33 1px, transparent 0),
+          linear-gradient(#ffffff33 1px, transparent 0),
+          linear-gradient(transparent, #07aaff);
+        background-size: 100% 1.5%, 10% 100%, 100% 8%, 100% 100%;
+        background-repeat: no-repeat, repeat, repeat, no-repeat;
+        background-position: 0 0, 0 0, 0 0, 0 0;
+        animation: move 1s infinite linear;
+        display: none;
+      }
+      @keyframes move {
+        to {
+          background-position: 0 100%, 0 0, 0 0, 0 0;
+          clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+        }
+      }
+      /* 图片预览相关样式 */
+      .preview-image {
+        cursor: pointer;
+        transition: opacity 0.3s;
+      }
+      .preview-image:hover {
+        opacity: 0.9;
+      }
+      .image-modal {
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.3s;
+      }
+      .hidden {
+        display: none !important;
+      }
+      .modal-content {
+        max-width: 90%;
+        max-height: 90%;
+        object-fit: contain;
+        border-radius: 4px;
+      }
+      .close-modal {
+        position: absolute;
+        top: 15px;
+        right: 25px;
+        color: #f1f1f1;
+        font-size: 40px;
+        font-weight: bold;
+        cursor: pointer;
+        z-index: 1001;
+      }
+      .close-modal:hover {
+        color: #bbb;
+      }
+
+      @media (min-width: 600px) {
+        #uploadForm {
+          flex-direction: column;
+        }
+        button[type='submit'] {
+          width: auto;
+          min-width: 120px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header-bar">
+        <h1>AI错题管家</h1>
+      </div>
+      <!-- 上传表单 -->
+      <form id="uploadForm">
+        <div class="file-upload">
+          <label for="fileInput" class="file-upload-label">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            <span>点击选择图片或拍照</span>
+          </label>
+          <input type="file" id="fileInput" accept="image/*" capture="camera" />
+          <!-- <div class="file-name" id="fileName">未选择文件</div> -->
+          <div class="img-box">
+            <div class="scanning"></div>
+            <img id="imagePreview" class="preview-image" />
+          </div>
+        </div>
+        <div class="button-group">
+          <button type="submit" id="analyzeButton" disabled>错题分析</button>
+          <button type="button" id="clearButton" class="clear-button hidden">
+            下一题
+          </button>
+        </div>
+      </form>
+
+      <!-- 结果显示区域 -->
+      <div id="result" class="hidden">
+        <h3>分析结果：</h3>
+        <pre id="textResult"></pre>
+        <!-- <img id="imagePreview" class="preview-image" /> -->
+        <div id="analysisResult"></div>
+      </div>
+
+      <!-- 图片预览模态框 -->
+      <div id="imageModal" class="image-modal hidden">
+        <span class="close-modal">&times;</span>
+        <img id="modalImage" class="modal-content" />
+      </div>
+
+      <!-- 错题列表 -->
+      <div id="errorList">
+        <h2>历史错题</h2>
+        <div id="errors"></div>
+      </div>
+    </div>
+    <script>
+      // 获取DOM元素
+      const fileInput = document.getElementById('fileInput');
+      const analyzeButton = document.getElementById('analyzeButton');
+      const clearButton = document.getElementById('clearButton');
+      const resultDiv = document.getElementById('result');
+      const imagePreview = document.getElementById('imagePreview');
+      const textResult = document.getElementById('textResult');
+      const analysisResult = document.getElementById('analysisResult');
+
+      // 图片预览功能
+      const imageModal = document.getElementById('imageModal');
+      const modalImage = document.getElementById('modalImage');
+      const closeModal = document.querySelector('.close-modal');
+
+      // 确保模态框初始状态为关闭
+      imageModal.classList.add('hidden');
+
+      // 清空结果按钮点击事件
+      clearButton.addEventListener('click', function () {
+        // 清空结果区域
+        resultDiv.classList.add('hidden');
+        textResult.textContent = '';
+        imagePreview.src = '';
+        analysisResult.innerHTML = '';
+
+        // 重置文件输入
+        fileInput.value = '';
+
+        // 更新按钮状态
+        analyzeButton.disabled = true;
+        analyzeButton.textContent = '错题分析';
+        clearButton.classList.add('hidden');
+
+        // 重置上传标签样式
+        const label = document.querySelector('.file-upload-label');
+        label.style.borderColor = '#3498db';
+        label.style.backgroundColor = '#f5f5f5';
+      });
+
+      // 点击图片打开预览
+      imagePreview.addEventListener('click', function () {
+        if (this.src) {
+          modalImage.src = this.src;
+          imageModal.classList.remove('hidden');
+          document.body.style.overflow = 'hidden'; // 防止背景滚动
+        }
+      });
+
+      // 点击关闭按钮关闭预览
+      closeModal.addEventListener('click', function (e) {
+        imageModal.classList.add('hidden');
+        document.body.style.overflow = '';
+        e.stopPropagation(); // 阻止事件冒泡
+      });
+
+      // 点击模态框背景关闭预览
+      imageModal.addEventListener('click', function (e) {
+        if (e.target === this) {
+          imageModal.classList.add('hidden');
+          document.body.style.overflow = '';
+        }
+      });
+
+      // 为历史错题中的图片也添加预览功能
+      function setupHistoryImagePreviews() {
+        const historyImages = document.querySelectorAll('.error-item img');
+        historyImages.forEach(img => {
+          img.classList.add('preview-image');
+          img.addEventListener('click', function () {
+            modalImage.src = this.src;
+            imageModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+          });
+        });
+      }
+
+      // 文件选择变化事件
+      fileInput.addEventListener('change', function (e) {
+        const hasFile = e.target.files.length > 0;
+        if (hasFile) {
+          // 立即显示选择的图片
+          const file = e.target.files[0];
+          const reader = new FileReader();
+          reader.onload = function (event) {
+            imagePreview.src = event.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
+
+        // 更新分析按钮状态
+        analyzeButton.disabled = !hasFile;
+
+        // 更新标签样式以显示已选择状态
+        const label = document.querySelector('.file-upload-label');
+        if (hasFile) {
+          label.style.borderColor = '#27ae60';
+          label.style.backgroundColor = '#eafaf1';
+        } else {
+          label.style.borderColor = '#3498db';
+          label.style.backgroundColor = '#f5f5f5';
+        }
+      });
+
+      // 上传处理
+      document
+        .getElementById('uploadForm')
+        .addEventListener('submit', async e => {
+          e.preventDefault();
+          const file = fileInput.files[0];
+
+          if (!file) {
+            showError('请选择一张图片');
+            return;
+          }
+
+          const formData = new FormData();
+          formData.append('image', file);
+
+          try {
+            // 显示加载状态
+            resultDiv.classList.remove('hidden');
+            textResult.textContent = '正在处理...';
+            clearButton.classList.remove('hidden');
+
+            // 禁用分析按钮，防止重复提交
+            analyzeButton.disabled = true;
+            analyzeButton.textContent = '分析中...';
+            // 显示扫描动画
+            document.querySelector('.scanning').style.display = 'block';
+            const response = await fetch('/upload', {
+              method: 'POST',
+              body: formData,
+            });
+            // 隐藏扫描动画
+            document.querySelector('.scanning').style.display = 'none';
+            const data = await response.json();
+            if (response.ok) {
+              // 显示结果
+              textResult.textContent = data.text;
+              fileInput.value = '';
+
+              // 保持按钮禁用状态
+              analyzeButton.disabled = true;
+              analyzeButton.textContent = '错题分析';
+
+              // 添加分析结果空值检查
+              if (data.analyze && data.analyze.subject) {
+                analysisResult.innerHTML = `
+                            <p>学科：${data.analyze.subject}</p>
+                            <p>知识点：${
+                              data.analyze.knowledge_points
+                                ? data.analyze.knowledge_points.join(', ')
+                                : '无'
+                            }</p>
+                            <p>错误类型：${
+                              data.analyze.error_type
+                                ? data.analyze.error_type
+                                : '无'
+                            }</p>
+                        `;
+              } else {
+                analysisResult.innerHTML =
+                  '<p class="error">题目分析失败，请稍后再试</p>';
+              }
+            } else {
+              showError(data.message || '请求失败');
+            }
+          } catch (error) {
+            showError('网络异常：' + error.message);
+          }
+
+          function showError(msg) {
+            resultDiv.classList.remove('hidden');
+            textResult.textContent = msg;
+            analysisResult.innerHTML = '';
+            clearButton.classList.remove('hidden');
+            // 隐藏扫描动画
+            document.querySelector('.scanning').style.display = 'none';
+            // 重置按钮状态但保持禁用
+            analyzeButton.textContent = '错题分析';
+            analyzeButton.disabled = true;
+          }
+
+          loadErrors();
+        });
+
+      // 加载历史记录
+      async function loadErrors() {
+        try {
+          const response = await fetch('/errors');
+          const data = await response.json();
+          if (response.ok) {
+            const errors = data.errors;
+            const container = document.getElementById('errors');
+
+            if (errors.length === 0) {
+              container.innerHTML = '<p>暂无历史错题</p>';
+              return;
+            }
+
+            container.innerHTML = errors
+              .map(
+                error => `
+                        <div class="error-item">
+                            ${
+                              error.original_filename
+                                ? `<img src="/static/images/${error.original_filename}">`
+                                : ''
+                            }
+                            <p><strong>时间：</strong>${new Date(
+                              error.timestamp
+                            ).toLocaleString()}</p>
+                            <p><strong>学科：</strong>${
+                              error.subject || '未知'
+                            }</p>
+                            <p><strong>错误类型：</strong>${
+                              error.error_type || '未知'
+                            }</p>
+                            <p><strong>参考答案：</strong>${
+                              error.answer || '无'
+                            }</p>
+                            <p><strong>解题思路：</strong> <a href="/error_page/${
+                              error.id
+                            }" class="detail-link">查看</a></p>
+                        </div>
+                    `
+              )
+              .join('');
+
+            // 设置历史错题图片预览功能
+            setupHistoryImagePreviews();
+          }
+        } catch (error) {
+          console.error('加载历史记录失败:', error);
+          document.getElementById('errors').innerHTML =
+            '<p class="error">加载历史记录失败</p>';
+        }
+      }
+
+      // 初始化加载
+      loadErrors();
+    </script>
+  </body>
+</html>
